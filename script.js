@@ -78,6 +78,12 @@ const main2 = async () => {
 };
 
 const main = async () => {
+  // const values = await readFile();
+  const url = './csv/file1.csv';
+  const data = await readFile(url);
+
+  console.log('VALUES : ', data);
+
   console.log('START');
   let driver;
   driver = await new Builder().forBrowser('chrome').build();
@@ -104,13 +110,11 @@ const main = async () => {
   const intCheck = await driver.findElement(By.name('intSelection'));
 
   await buildVersion.sendKeys('3');
-  console.log(await intCheck.isSelected());
   await intCheck.click();
-  console.log(await intCheck.isSelected());
 
-  // await calculate(driver, num1, num2, calc, ans, clear, 20, 30);
-  // await calculate(driver, num1, num2, calc, ans, clear, 5, 10);
-  // await calculate(driver, num1, num2, calc, ans, clear, 90, 86);
+  for (const item of data) {
+    await calculate(driver, num1, num2, calc, ans, clear, item[0], item[1]);
+  }
 
   //   await num1.sendKeys(20);
   //   await num2.sendKeys(30);
@@ -160,18 +164,18 @@ const calculate = async (
   // return
 };
 
-const readFile = async () => {
-  const stream = createReadStream('./csv/file1.csv');
-  await csv
-    .parseStream(stream, { headers: false })
-    .on('data', (data) => {
-      console.log('One line of data', data);
-    })
-    .on('end', () => {
-      console.log('done');
-    });
-  console.log('asd');
-};
+var readFile = (url) =>
+  new Promise((resolve) => {
+    let returnList = [];
+    csv
+      .parseFile(url, { headers: false })
+      .on('data', (data) => {
+        // console.log(data);
+        returnList.push(data);
+      })
+      .on('end', () => {
+        resolve(returnList);
+      });
+  });
 
-// readFile();
 main();
