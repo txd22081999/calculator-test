@@ -97,50 +97,63 @@ const main = async () => {
   const operation = await driver.wait(
     until.elementLocated(By.id('selectOperationDropdown'))
   );
-  let calculate = await driver.findElement(By.id('calculateButton'));
+  let calc = await driver.findElement(By.id('calculateButton'));
   let calcForm = await driver.findElement(By.id('calcForm'));
   let clear = await driver.findElement(By.id('clearButton'));
-  //   const calculate = await driver.wait(
-  //     until.elementLocated(By.id('calculateButton'))
-  //   );
-  //   console.log(await operation.isEnabled())
-  //   console.log(operation);
+
   await operation.sendKeys('2');
   await buildVersion.sendKeys('3');
 
-  await num1.sendKeys(20);
-  await num2.sendKeys(30);
-  await calculate.click();
-  console.log(await ans.getAttribute('value'));
-  await driver.wait(until.elementIsEnabled(clear));
-  //   console.log(await clear.isEnabled());
-  await clear.click();
+  await calculate(driver, num1, num2, calc, ans, clear, 20, 30);
+  await calculate(driver, num1, num2, calc, ans, clear, 5, 10);
+  await calculate(driver, num1, num2, calc, ans, clear, 90, 86);
 
-  await num1.clear();
-  await num2.clear();
-  await num1.sendKeys(11);
-  await num2.sendKeys(22);
-  await calculate.click();
-  console.log(await ans.getAttribute('value'));
-  await driver.wait(until.elementIsEnabled(clear));
-  await clear.click();
+  //   await num1.sendKeys(20);
+  //   await num2.sendKeys(30);
+  //   await calc.click();
+  //   console.log(await ans.getAttribute('value'));
+  //   await driver.wait(until.elementIsEnabled(clear));
+  //   await clear.click();
 
-  await num1.sendKeys(33);
-  await num2.sendKeys(44);
-  await calculate.click();
-  console.log(await ans.getAttribute('value'));
-  await driver.wait(until.elementIsEnabled(clear));
-  await clear.click();
+  //   await num1.clear();
+  //   await num2.clear();
+  //   await num1.sendKeys(11);
+  //   await num2.sendKeys(22);
+  //   await calc.click();
+  //   console.log(await ans.getAttribute('value'));
+  //   await driver.wait(until.elementIsEnabled(clear));
+  //   await clear.click();
 
   //   await num1.sendKeys(33);
   //   await num2.sendKeys(44);
-  //   await calculate.click();
+  //   await calc.click();
   //   console.log(await ans.getAttribute('value'));
+  //   await driver.wait(until.elementIsEnabled(clear));
+  //   await clear.click();
 
   console.log('DONE');
   //   driver.quit();
-  //   console.log(buildVersion.value);
-  //   console.log(buildVersion);
+};
+
+const calculate = async (
+  driver,
+  num1,
+  num2,
+  calc,
+  ans,
+  clear,
+  num1Val,
+  num2Val
+) => {
+  await num1.clear();
+  await num2.clear();
+  await num1.sendKeys(num1Val);
+  await num2.sendKeys(num2Val);
+  await calc.click();
+  console.log(await ans.getAttribute('value'));
+  await driver.wait(until.elementIsEnabled(clear));
+  await clear.click();
+  // return
 };
 
 const readFile = async () => {
