@@ -1,0 +1,17 @@
+{
+  "name": "calculator-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "dependencies": {
+    "chromedriver": "^87.0.4",
+    "fast-csv": "^4.3.6",
+    "selenium-webdriver": "^4.0.0-alpha.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
