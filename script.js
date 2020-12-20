@@ -93,20 +93,24 @@ const main = async () => {
   const res = await ans.getText();
 
   //   const operation = await driver.findElement(By.name('selectOperation'));
-  //   const operation = await driver.findElement(By.id('selectOperationDropdown'));
-  const operation = await driver.wait(
-    until.elementLocated(By.id('selectOperationDropdown'))
-  );
+  const op = await driver.findElement(By.id('selectOperationDropdown'));
+  await op.sendKeys('Subtract');
+  // const operation = await driver.wait(
+  //   until.elementLocated(By.id('selectOperationDropdown'))
+  // );
   let calc = await driver.findElement(By.id('calculateButton'));
   let calcForm = await driver.findElement(By.id('calcForm'));
   let clear = await driver.findElement(By.id('clearButton'));
+  const intCheck = await driver.findElement(By.name('intSelection'));
 
-  await operation.sendKeys('2');
   await buildVersion.sendKeys('3');
+  console.log(await intCheck.isSelected());
+  await intCheck.click();
+  console.log(await intCheck.isSelected());
 
-  await calculate(driver, num1, num2, calc, ans, clear, 20, 30);
-  await calculate(driver, num1, num2, calc, ans, clear, 5, 10);
-  await calculate(driver, num1, num2, calc, ans, clear, 90, 86);
+  // await calculate(driver, num1, num2, calc, ans, clear, 20, 30);
+  // await calculate(driver, num1, num2, calc, ans, clear, 5, 10);
+  // await calculate(driver, num1, num2, calc, ans, clear, 90, 86);
 
   //   await num1.sendKeys(20);
   //   await num2.sendKeys(30);
