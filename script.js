@@ -1,14 +1,11 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const csv = require('fast-csv');
-const fs = require('fs');
 const { writeToPath } = require('@fast-csv/format');
 const { ERROR, OPERATION } = require('./utils');
 
 // const webdriver = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const chromedriver = require('chromedriver');
-const { createReadStream, createWriteStream } = require('fs');
-const { LogManager } = require('selenium-webdriver/lib/logging');
 
 chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
 
@@ -16,16 +13,10 @@ const { ENTER, CONTROL, DELETE } = Key;
 
 const { ADD, SUBTRACT, MULTIPLY, DIVIDE, CONCATENATE } = OPERATION;
 
-// opVal: operation
-// buildVer: build version
+// opVal: operation type
 const test = async (opVal) => {
-  // let buildVer = '0';
-
   const finalResults = []; // Store result with total pass, fail, run
-  const buildVers = [0, 1, 2, 3, 4, 5, 6, 7, 9]; // build version
-  // const buildVers = [8]; // build version
-  // const buildVers = []; // build version
-  // const buildVers = [0];
+  const buildVers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; // build version
   let inputPath = ''; // input file
   let outputPath = ''; // output file
 
@@ -85,7 +76,7 @@ const test = async (opVal) => {
     const err = await driver.findElement(By.id('errorMsgField')); // error message element
     const intCheck = await driver.findElement(By.name('intSelection')); // integer only element
 
-    const result = [];
+    let result = [];
     let totalPass = 0;
     let totalFail = 0;
     let totalCase = 0;
@@ -173,6 +164,7 @@ const test = async (opVal) => {
       totalPass = 0;
       totalFail = 0;
       totalCase = 0;
+      result = [];
     }
 
     console.log('DONE WITHOUT ERROR');
@@ -266,8 +258,8 @@ const readFile = (url) =>
       });
   });
 
-// test(ADD);
+test(ADD);
 // test(SUBTRACT);
 // test(MULTIPLY);
-test(DIVIDE);
+// test(DIVIDE);
 // test(CONCATENATE);
