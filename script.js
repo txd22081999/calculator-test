@@ -82,98 +82,130 @@ const main2 = async () => {
 
 const main = async () => {
   // const values = await readFile();
-  const inputPath = './input/add.csv';
-  const outputPath = './output/add.csv';
-
-  const data = await readFile(inputPath);
-  let outputData = await readFile(outputPath);
-
-  outputData = outputData.map((item) => Number(item[0]));
-  console.log(outputData);
-
-  console.log('VALUES : ', data);
-
-  console.log('START');
-  let driver;
-  driver = await new Builder().forBrowser('chrome').build();
-  await driver.manage().window().maximize();
-  await driver.get('https://testsheepnz.github.io/BasicCalculator.html');
-  //   await driver.findElement(By.name('q')).sendKeys('leetcode', ENTER);
-  const buildVersion = await driver.wait(
-    until.elementLocated(By.name('selectBuild'))
-  );
-  const num1 = await driver.findElement(By.name('number1'));
-  const num2 = await driver.findElement(By.name('number2'));
-  const ans = await driver.findElement(By.name('numberAnswer'));
-  // const res = await ans.getText();
-
-  //   const operation = await driver.findElement(By.name('selectOperation'));
-  const op = await driver.findElement(By.id('selectOperationDropdown'));
-
-  // const operation = await driver.wait(
-  //   until.elementLocated(By.id('selectOperationDropdown'))
-  // );
-  let calc = await driver.findElement(By.id('calculateButton'));
-  let calcForm = await driver.findElement(By.id('calcForm'));
-  let clear = await driver.findElement(By.id('clearButton'));
-  const err = await driver.findElement(By.id('errorMsgField'));
-  const intCheck = await driver.findElement(By.name('intSelection'));
-
-  await buildVersion.sendKeys('3');
-  await intCheck.click();
-
-  // await calculate(driver, num1, num2, calc, ans, clear, '---12', 3);
-  const { ADD, SUBTRACT, MULTIPLY, DIVIDE, CONCATENATE } = OPERATION;
-
-  const result = [];
-  let totalPass = 0;
-  let totalFail = 0;
-  let totalCase = 0;
-
-  let index = 0;
-  for (const item of data) {
-    const { pass, res } = await calculate(
-      driver,
-      op,
-      num1,
-      num2,
-      calc,
-      ans,
-      err,
-      clear,
-      ADD,
-      item[0],
-      item[1],
-      outputData[index]
-    );
-    totalCase++;
-    if (pass === 'PASSED') {
-      totalPass++;
-    }
-    if (pass === 'FAILED') {
-      totalFail++;
-    }
-    result.push({ pass, res });
-    index++;
+  const finalResults = [];
+  const buildVers = [0, 1, 2];
+  for (const item of buildVers) {
+    console.log(item.toString());
+    const result = await test(item.toString());
+    finalResults.push(result);
   }
+};
 
-  const resultPath = './result/add.csv';
-  // const outputData = result.map((item) => ({
-  //   pass: item
-  // }));
-  // const options = { headers: true, quoteColumns: true };
+const test = async (buildVer) => {
+  // let buildVer = '0';
+  const finalResults = [];
+  const buildVers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const inputPath = './input/add/add.csv';
+  const outputPath = './output/add/add.csv';
 
-  writeToPath(resultPath, result)
-    .on('error', (err) => console.error(err))
-    .on('finish', () => console.log('Done writing.'));
-  console.log(result);
+  try {
+    const data = await readFile(inputPath);
+    let outputData = await readFile(outputPath);
 
-  console.log('Total case : ', totalCase);
-  console.log('Total passed : ', totalPass);
-  console.log('Total failed : ', totalFail);
+    outputData = outputData.map((item) => item[0]);
 
-  console.log('DONE');
-  //   driver.quit();
+    console.log('START');
+    let driver;
+    driver = await new Builder().forBrowser('chrome').build();
+    await driver.manage().window().maximize();
+    await driver.get('https://testsheepnz.github.io/BasicCalculator.html');
+    //   await driver.findElement(By.name('q')).sendKeys('leetcode', ENTER);
+    const buildVersion = await driver.wait(
+      until.elementLocated(By.name('selectBuild'))
+    );
+    const num1 = await driver.findElement(By.name('number1'));
+    const num2 = await driver.findElement(By.name('number2'));
+    const ans = await driver.findElement(By.name('numberAnswer'));
+    // const res = await ans.getText();
+
+    //   const operation = await driver.findElement(By.name('selectOperation'));
+    const op = await driver.findElement(By.id('selectOperationDropdown'));
+
+    // const operation = await driver.wait(
+    //   until.elementLocated(By.id('selectOperationDropdown'))
+    // );
+    let calc = await driver.findElement(By.id('calculateButton'));
+    let calcForm = await driver.findElement(By.id('calcForm'));
+    let clear = await driver.findElement(By.id('clearButton'));
+    const err = await driver.findElement(By.id('errorMsgField'));
+    const intCheck = await driver.findElement(By.name('intSelection'));
+
+    // await buildVersion.sendKeys(buildVer.toString());
+    await intCheck.click();
+
+    // await calculate(driver, num1, num2, calc, ans, clear, '---12', 3);
+    const { ADD, SUBTRACT, MULTIPLY, DIVIDE, CONCATENATE } = OPERATION;
+
+    const result = [];
+    let totalPass = 0;
+    let totalFail = 0;
+    let totalCase = 0;
+
+    for (const build of buildVers) {
+      await buildVersion.sendKeys(build.toString());
+      let index = 0;
+      for (const item of data) {
+        const { pass, res } = await calculate(
+          driver,
+          op,
+          num1,
+          num2,
+          calc,
+          ans,
+          err,
+          clear,
+          ADD,
+          item[0],
+          item[1],
+          outputData[index]
+        );
+        totalCase++;
+        if (pass === 'PASSED') {
+          totalPass++;
+        }
+        if (pass === 'FAILED') {
+          totalFail++;
+        }
+        result.push({ pass, res });
+        index++;
+      }
+
+      const resultPath = `./result/add/add(${build}).csv`;
+      // const outputData = result.map((item) => ({
+      //   pass: item
+      // }));
+      // const options = { headers: true, quoteColumns: true };
+
+      writeToPath(resultPath, result)
+        .on('error', (err) => console.error(err))
+        .on('finish', () => console.log('Done writing.'));
+      console.log(result);
+
+      console.log('Total case : ', totalCase);
+      console.log('Total passed : ', totalPass);
+      console.log('Total failed : ', totalFail);
+
+      finalResults.push({
+        buildVersion: build,
+        totalCase,
+        totalPass,
+        totalFail
+      });
+
+      totalPass = 0;
+      totalFail = 0;
+      totalCase = 0;
+    }
+
+    console.log('DONE WITHOUT ERROR');
+  } catch (error) {
+    console.log(error);
+    console.log('DONE WITH ERROR');
+  } finally {
+    console.log(finalResults);
+  }
+  // driver.quit();
+  // return { totalCase, totalPass, totalFail };
 };
 
 const calculate = async (
@@ -206,12 +238,14 @@ const calculate = async (
   const hasError = await err.isDisplayed();
   let pass = 'PASSED';
   if (hasError) {
-    pass = 'FAILED';
     const errMsg = await err.getText();
+    if (expected !== errMsg) {
+      pass = 'FAILED';
+    }
     res = errMsg;
-    console.log('ERROR: ', errMsg);
+    // console.log('ERROR: ', errMsg);
     // console.log(errMsg === NUM1_ERROR);
-  } else if (Number(res) === expected) {
+  } else if (Number(res) === Number(expected)) {
     console.log('PASS');
   } else {
     console.log('FAILED');
@@ -237,4 +271,4 @@ const readFile = (url) =>
       });
   });
 
-main();
+test();
