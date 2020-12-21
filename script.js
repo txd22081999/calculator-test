@@ -82,8 +82,14 @@ const main2 = async () => {
 
 const main = async () => {
   // const values = await readFile();
-  const url = './input/add.csv';
-  const data = await readFile(url);
+  const inputPath = './input/add.csv';
+  const outputPath = './output/add.csv';
+
+  const data = await readFile(inputPath);
+  let outputData = await readFile(outputPath);
+
+  outputData = outputData.map((item) => Number(item[0]));
+  console.log(outputData);
 
   console.log('VALUES : ', data);
 
@@ -124,8 +130,8 @@ const main = async () => {
   let totalFail = 0;
   let totalCase = 0;
 
+  let index = 0;
   for (const item of data) {
-    // console.log(await err.isDisplayed());
     const { pass, res } = await calculate(
       driver,
       op,
@@ -135,11 +141,11 @@ const main = async () => {
       ans,
       err,
       clear,
-      DIVIDE,
+      ADD,
       item[0],
-      item[1]
+      item[1],
+      outputData[index]
     );
-    // console.log(pass);
     totalCase++;
     if (pass === 'PASSED') {
       totalPass++;
@@ -148,14 +154,16 @@ const main = async () => {
       totalFail++;
     }
     result.push({ pass, res });
+    index++;
   }
-  const path = `output/add.csv`;
+
+  const resultPath = './result/add.csv';
   // const outputData = result.map((item) => ({
   //   pass: item
   // }));
   // const options = { headers: true, quoteColumns: true };
 
-  writeToPath(path, result)
+  writeToPath(resultPath, result)
     .on('error', (err) => console.error(err))
     .on('finish', () => console.log('Done writing.'));
   console.log(result);
@@ -179,7 +187,8 @@ const calculate = async (
   clear,
   opVal,
   num1Val,
-  num2Val
+  num2Val,
+  expected
 ) => {
   const { NUM1_ERROR, NUM2_ERROR } = ERROR;
 
@@ -202,9 +211,13 @@ const calculate = async (
     res = errMsg;
     console.log('ERROR: ', errMsg);
     // console.log(errMsg === NUM1_ERROR);
-  } else {
+  } else if (Number(res) === expected) {
     console.log('PASS');
+  } else {
+    console.log('FAILED');
+    pass = 'FAILED';
   }
+  // console.log(res, expected);
   await driver.wait(until.elementIsEnabled(clear));
   await clear.click();
   return { pass, res };
