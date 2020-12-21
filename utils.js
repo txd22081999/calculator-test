@@ -3,6 +3,8 @@ const ERROR = {
   NUM2_ERROR: 'Number 2 is not a number'
 };
 
+// Divide by zero error!
+
 const OPERATION = {
   ADD: 'Add',
   SUBTRACT: 'Subtract',
