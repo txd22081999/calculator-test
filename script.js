@@ -2,7 +2,7 @@ const { Builder, By, Key, until } = require('selenium-webdriver');
 const csv = require('fast-csv');
 const fs = require('fs');
 const { writeToPath } = require('@fast-csv/format');
-const ERROR = require('./utils');
+const { ERROR, OPERATION } = require('./utils');
 
 // const webdriver = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
@@ -103,7 +103,7 @@ const main = async () => {
 
   //   const operation = await driver.findElement(By.name('selectOperation'));
   const op = await driver.findElement(By.id('selectOperationDropdown'));
-  await op.sendKeys('Subtract');
+
   // const operation = await driver.wait(
   //   until.elementLocated(By.id('selectOperationDropdown'))
   // );
@@ -117,21 +117,36 @@ const main = async () => {
   await intCheck.click();
 
   // await calculate(driver, num1, num2, calc, ans, clear, '---12', 3);
+  const { ADD, SUBTRACT, MULTIPLY, DIVIDE, CONCATENATE } = OPERATION;
+
   const result = [];
+  let totalPass = 0;
+  let totalFail = 0;
+  let totalCase = 0;
+
   for (const item of data) {
     // console.log(await err.isDisplayed());
     const { pass, res } = await calculate(
       driver,
+      op,
       num1,
       num2,
       calc,
       ans,
       err,
       clear,
+      DIVIDE,
       item[0],
       item[1]
     );
     // console.log(pass);
+    totalCase++;
+    if (pass === 'PASSED') {
+      totalPass++;
+    }
+    if (pass === 'FAILED') {
+      totalFail++;
+    }
     result.push({ pass, res });
   }
   const path = `output/add.csv`;
@@ -145,24 +160,32 @@ const main = async () => {
     .on('finish', () => console.log('Done writing.'));
   console.log(result);
 
+  console.log('Total case : ', totalCase);
+  console.log('Total passed : ', totalPass);
+  console.log('Total failed : ', totalFail);
+
   console.log('DONE');
   //   driver.quit();
 };
 
 const calculate = async (
   driver,
+  op,
   num1,
   num2,
   calc,
   ans,
   err,
   clear,
+  opVal,
   num1Val,
   num2Val
 ) => {
   const { NUM1_ERROR, NUM2_ERROR } = ERROR;
+
   await num1.clear();
   await num2.clear();
+  await op.sendKeys(opVal);
   await num1.sendKeys(num1Val);
   await num2.sendKeys(num2Val);
   await calc.click();

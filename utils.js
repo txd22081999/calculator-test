@@ -3,4 +3,12 @@ const ERROR = {
   NUM2_ERROR: 'Number 2 is not a number'
 };
 
-module.exports = ERROR;
+const OPERATION = {
+  ADD: 'Add',
+  SUBTRACT: 'Subtract',
+  MULTIPLY: 'Multiply',
+  DIVIDE: 'Divide',
+  CONCATENATE: 'Concatenate'
+};
+
+module.exports = { ERROR, OPERATION };
