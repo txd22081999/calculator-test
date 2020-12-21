@@ -1,11 +1,14 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const csv = require('fast-csv');
-const a = require('selenium-webdriver');
+const fs = require('fs');
+const { writeToPath } = require('@fast-csv/format');
+const ERROR = require('./utils');
 
 // const webdriver = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const chromedriver = require('chromedriver');
-const { createReadStream } = require('fs');
+const { createReadStream, createWriteStream } = require('fs');
+const { LogManager } = require('selenium-webdriver/lib/logging');
 
 chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
 
@@ -79,7 +82,7 @@ const main2 = async () => {
 
 const main = async () => {
   // const values = await readFile();
-  const url = './csv/file1.csv';
+  const url = './input/add.csv';
   const data = await readFile(url);
 
   console.log('VALUES : ', data);
@@ -107,14 +110,43 @@ const main = async () => {
   let calc = await driver.findElement(By.id('calculateButton'));
   let calcForm = await driver.findElement(By.id('calcForm'));
   let clear = await driver.findElement(By.id('clearButton'));
+  const err = await driver.findElement(By.id('errorMsgField'));
   const intCheck = await driver.findElement(By.name('intSelection'));
 
   await buildVersion.sendKeys('3');
   await intCheck.click();
 
+  // await calculate(driver, num1, num2, calc, ans, clear, '---12', 3);
+  const result = [];
   for (const item of data) {
-    await calculate(driver, num1, num2, calc, ans, clear, item[0], item[1]);
+    // console.log(await err.isDisplayed());
+    const pass = await calculate(
+      driver,
+      num1,
+      num2,
+      calc,
+      ans,
+      err,
+      clear,
+      item[0],
+      item[1]
+    );
+    // console.log(pass);
+    result.push(pass);
   }
+  const path = `output/add.csv`;
+  // const data2 = [{ id: 10 }, { id: 20 }];
+  const outputData = result.map((item) => ({
+    pass: item
+  }));
+  const options = { headers: true, quoteColumns: true };
+
+  writeToPath(path, outputData)
+    .on('error', (err) => console.error(err))
+    .on('finish', () => console.log('Done writing.'));
+  // await fs.writeFileSync('./output/add.csv', result);
+  // await csv.write(result);
+  console.log(result);
 
   //   await num1.sendKeys(20);
   //   await num2.sendKeys(30);
@@ -149,19 +181,34 @@ const calculate = async (
   num2,
   calc,
   ans,
+  err,
   clear,
   num1Val,
   num2Val
 ) => {
+  const { NUM1_ERROR, NUM2_ERROR } = ERROR;
   await num1.clear();
   await num2.clear();
   await num1.sendKeys(num1Val);
   await num2.sendKeys(num2Val);
   await calc.click();
-  console.log(await ans.getAttribute('value'));
+  console.log('RESULT: ', await ans.getAttribute('value'));
+
+  // await driver.wait(until.elementLocated(err));
+
+  const hasError = await err.isDisplayed();
+  let pass = 1;
+  if (hasError) {
+    pass = 0;
+    // const errMsg = await err.getText();
+    // console.log('ERROR: ', errMsg);
+    // console.log(errMsg === NUM1_ERROR);
+  } else {
+    // console.log('PASS');
+  }
   await driver.wait(until.elementIsEnabled(clear));
   await clear.click();
-  // return
+  return pass;
 };
 
 var readFile = (url) =>
