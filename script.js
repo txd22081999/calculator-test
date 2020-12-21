@@ -135,41 +135,15 @@ const main = async () => {
     result.push(pass);
   }
   const path = `output/add.csv`;
-  // const data2 = [{ id: 10 }, { id: 20 }];
   const outputData = result.map((item) => ({
     pass: item
   }));
-  const options = { headers: true, quoteColumns: true };
+  // const options = { headers: true, quoteColumns: true };
 
   writeToPath(path, outputData)
     .on('error', (err) => console.error(err))
     .on('finish', () => console.log('Done writing.'));
-  // await fs.writeFileSync('./output/add.csv', result);
-  // await csv.write(result);
   console.log(result);
-
-  //   await num1.sendKeys(20);
-  //   await num2.sendKeys(30);
-  //   await calc.click();
-  //   console.log(await ans.getAttribute('value'));
-  //   await driver.wait(until.elementIsEnabled(clear));
-  //   await clear.click();
-
-  //   await num1.clear();
-  //   await num2.clear();
-  //   await num1.sendKeys(11);
-  //   await num2.sendKeys(22);
-  //   await calc.click();
-  //   console.log(await ans.getAttribute('value'));
-  //   await driver.wait(until.elementIsEnabled(clear));
-  //   await clear.click();
-
-  //   await num1.sendKeys(33);
-  //   await num2.sendKeys(44);
-  //   await calc.click();
-  //   console.log(await ans.getAttribute('value'));
-  //   await driver.wait(until.elementIsEnabled(clear));
-  //   await clear.click();
 
   console.log('DONE');
   //   driver.quit();
@@ -200,18 +174,18 @@ const calculate = async (
   let pass = 1;
   if (hasError) {
     pass = 0;
-    // const errMsg = await err.getText();
-    // console.log('ERROR: ', errMsg);
+    const errMsg = await err.getText();
+    console.log('ERROR: ', errMsg);
     // console.log(errMsg === NUM1_ERROR);
   } else {
-    // console.log('PASS');
+    console.log('PASS');
   }
   await driver.wait(until.elementIsEnabled(clear));
   await clear.click();
   return pass;
 };
 
-var readFile = (url) =>
+const readFile = (url) =>
   new Promise((resolve) => {
     let returnList = [];
     csv
