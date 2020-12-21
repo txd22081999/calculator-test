@@ -99,7 +99,7 @@ const main = async () => {
   const num1 = await driver.findElement(By.name('number1'));
   const num2 = await driver.findElement(By.name('number2'));
   const ans = await driver.findElement(By.name('numberAnswer'));
-  const res = await ans.getText();
+  // const res = await ans.getText();
 
   //   const operation = await driver.findElement(By.name('selectOperation'));
   const op = await driver.findElement(By.id('selectOperationDropdown'));
@@ -120,7 +120,7 @@ const main = async () => {
   const result = [];
   for (const item of data) {
     // console.log(await err.isDisplayed());
-    const pass = await calculate(
+    const { pass, res } = await calculate(
       driver,
       num1,
       num2,
@@ -132,15 +132,15 @@ const main = async () => {
       item[1]
     );
     // console.log(pass);
-    result.push(pass);
+    result.push({ pass, res });
   }
   const path = `output/add.csv`;
-  const outputData = result.map((item) => ({
-    pass: item
-  }));
+  // const outputData = result.map((item) => ({
+  //   pass: item
+  // }));
   // const options = { headers: true, quoteColumns: true };
 
-  writeToPath(path, outputData)
+  writeToPath(path, result)
     .on('error', (err) => console.error(err))
     .on('finish', () => console.log('Done writing.'));
   console.log(result);
@@ -166,15 +166,17 @@ const calculate = async (
   await num1.sendKeys(num1Val);
   await num2.sendKeys(num2Val);
   await calc.click();
-  console.log('RESULT: ', await ans.getAttribute('value'));
+  let res = await ans.getAttribute('value');
+  console.log('RESULT: ', res);
 
   // await driver.wait(until.elementLocated(err));
 
   const hasError = await err.isDisplayed();
-  let pass = 1;
+  let pass = 'PASSED';
   if (hasError) {
-    pass = 0;
+    pass = 'FAILED';
     const errMsg = await err.getText();
+    res = errMsg;
     console.log('ERROR: ', errMsg);
     // console.log(errMsg === NUM1_ERROR);
   } else {
@@ -182,7 +184,7 @@ const calculate = async (
   }
   await driver.wait(until.elementIsEnabled(clear));
   await clear.click();
-  return pass;
+  return { pass, res };
 };
 
 const readFile = (url) =>
